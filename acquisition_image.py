@@ -1,3 +1,5 @@
+    # Fichier permettant l'acquisition des images depuis le rasberry
+
 import cv2
 import numpy
 import matplotlib.image as mp
