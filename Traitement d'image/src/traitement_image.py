@@ -1,10 +1,8 @@
     # Fichier permettant le traitement des images recues depuis le Rasberry
 
 # Import des librairies
-import matplotlib.image as mpimg
 import matplotlib.pyplot as mplot
 import numpy as np
-import PIL.Image as pim
 
 # Fonctions de traitement :
 
@@ -23,22 +21,19 @@ nb_img = 5
 
 #while(True):
 for k in range(nb_img):
-    img = mpimg.imread('images/image_'+str(k+1)+'.png')
-    img = np.asarray(pim.open('images/image_'+str(k+1)+'.png'))
-    img = 255 * img
-    print(img)
-    print(img[34,100,1])
+    img = mplot.imread('images/image_'+str(k+1)+'.png')
     format = np.shape(img)
-    new_img=np.empty((format[0],format[1]))
+    new_img=np.empty(format)
     for i in range(format[0]):
         for j in range(format[1]):
             img_R = img[i,j,0]
             img_G = img[i,i,1]
             img_B = img[i,j,2]
             img_I = img[i,i,3]
-            #if (img_R>100) & (img_G>100) & (img_B<250) & (img_I<100)
-    
-        # Traitement : 
-    
-        #mplot.imshow(img)
-        #mplot.show()
+            if (img_R<0.5) & (img_G<0.5) & (img_B>0.8) & (img_I>0.2):
+                new_img[i,j,3] = 0
+            else:
+                new_img[i,j,3] = 1
+mplot.imshow(new_img)
+mplot.axis('off')
+mplot.show()

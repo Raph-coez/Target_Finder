@@ -15,4 +15,5 @@ while count <= 5:
     copy_image = numpy.copy(image)
     image_name = 'images/image_' + str(count) + '.png'
     mp.imsave(image_name, copy_image)
+    print('Image '+str(count)+' saved')
     count += 1
