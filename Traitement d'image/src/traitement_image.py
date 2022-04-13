@@ -9,27 +9,29 @@ from algos import *
 
 # Processing : choix de la methode de traitement
 def Processing(img):
-    return TOR(img)
+    return TOR_A(img)
 
+# Check_Prop : check la proportion de pixel blanc et en deduit la presence de la cible
 def check_prop(prop):
     ret = ""
-    print(prop)
-    if prop > 0.001:
+    if prop < 10:
         ret = "Cible reperee"
+        print('Cible reperee pour n =  '+str(prop))
     else:
         ret = "Pas de cible"
+        print('Cible non reperee, n = '+str(prop))
     return ret
         
 
 # Periode de recuperation des images (ms)
-T = 20
+T = 200
 
 # Camera
 cam = cv2.VideoCapture(0)
-plt.figure(1)
 
 # Boucle d'affichage
 while True:
+    plt.figure(figsize=(14,8), dpi=80)
     ret, img = cam.read()
     if ret:
         copy_image = np.copy(img)
@@ -42,13 +44,11 @@ while True:
         plt.axis('off')
         plt.subplot(122)
         plt.imshow(processed_img)
-        plt.title(check_prop(prop))
+        plt.title("Image traitee : " + check_prop(prop))
         plt.axis('off')
         plt.show(False)
-        plt.pause(2)
+        plt.waitforbuttonpress()
         plt.close()
-        if cv2.waitKey(T) & 0xFF == ord('q'):
-            break
     else:
         print('Aucun retour camera')
         break
