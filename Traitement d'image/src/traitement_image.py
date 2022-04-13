@@ -1,39 +1,54 @@
     # Fichier permettant le traitement des images recues depuis le Rasberry
 
-# Import des librairies
-import matplotlib.pyplot as mplot
+# Import des librairies / algos
+import matplotlib.pyplot as plt
+import matplotlib.image as pim
 import numpy as np
+import cv2
+from algos import *
 
-# Fonctions de traitement :
-
-# Processing : Recupere une image, applique un K-means
+# Processing : choix de la methode de traitement
 def Processing(img):
-    exit(0)
-    
-    
+    return TOR(img)
 
-# Recuperation de l'image
-# Je pars du principe qu'on recupere les images dans un dossier qui s'actualise au fur et a mesure de la reception
+def check_prop(prop):
+    ret = ""
+    print(prop)
+    if prop > 0.001:
+        ret = "Cible reperee"
+    else:
+        ret = "Pas de cible"
+    return ret
+        
 
-# Nombre d'image que peut contenir le dossier au max :
-nb_img = 5
-# Frequence de recuperation des images ?
+# Periode de recuperation des images (ms)
+T = 20
 
-#while(True):
-for k in range(nb_img):
-    img = mplot.imread('images/image_'+str(k+1)+'.png')
-    format = np.shape(img)
-    new_img=np.empty(format)
-    for i in range(format[0]):
-        for j in range(format[1]):
-            img_R = img[i,j,0]
-            img_G = img[i,i,1]
-            img_B = img[i,j,2]
-            img_I = img[i,i,3]
-            if (img_R<0.5) & (img_G<0.5) & (img_B>0.8) & (img_I>0.2):
-                new_img[i,j,3] = 0
-            else:
-                new_img[i,j,3] = 1
-mplot.imshow(new_img)
-mplot.axis('off')
-mplot.show()
+# Camera
+cam = cv2.VideoCapture(0)
+plt.figure(1)
+
+# Boucle d'affichage
+while True:
+    ret, img = cam.read()
+    if ret:
+        copy_image = np.copy(img)
+        pim.imsave('images/cam.png', img)
+        img = plt.imread('images/cam.png')
+        processed_img, prop = Processing(img)
+        plt.subplot(121)
+        plt.imshow(img)
+        plt.title('Image non traitee')
+        plt.axis('off')
+        plt.subplot(122)
+        plt.imshow(processed_img)
+        plt.title(check_prop(prop))
+        plt.axis('off')
+        plt.show(False)
+        plt.pause(2)
+        plt.close()
+        if cv2.waitKey(T) & 0xFF == ord('q'):
+            break
+    else:
+        print('Aucun retour camera')
+        break

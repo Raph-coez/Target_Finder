@@ -1,10 +1,11 @@
 # Imports
 import matplotlib.pyplot as mplot
 import numpy as np
-from algos_TOR import *
+from algos import *
 
 # Choix de l'image a tester
-img = mplot.imread('./images/test.png')
+img = mplot.imread('./images/image_1.png')
+print(np.shape(img))
 
 # Choix des algos
 new_img_1 = TOR_blue(img)
