@@ -95,3 +95,14 @@ def TOR_A(img):  # a, b, c, d : tolerance en RGBA
     else:
         proportion = taille
     return new_img, proportion
+
+# Check_Prop : check la proportion de pixel blanc et en deduit la presence de la cible
+def check_prop(prop):
+    ret = ""
+    if prop < 10:
+        ret = "Cible reperee"
+        print('Cible reperee pour n =  '+str(prop))
+    else:
+        ret = "Pas de cible"
+        print('Cible non reperee, n = '+str(prop))
+    return ret

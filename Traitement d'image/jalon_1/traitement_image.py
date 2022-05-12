@@ -11,18 +11,6 @@ from algos import *
 def Processing(img):
     return TOR_A(img)
 
-# Check_Prop : check la proportion de pixel blanc et en deduit la presence de la cible
-def check_prop(prop):
-    ret = ""
-    if prop < 10:
-        ret = "Cible reperee"
-        print('Cible reperee pour n =  '+str(prop))
-    else:
-        ret = "Pas de cible"
-        print('Cible non reperee, n = '+str(prop))
-    return ret
-        
-
 # Periode de recuperation des images (ms)
 T = 200
 
