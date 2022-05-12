@@ -99,7 +99,7 @@ def main_detection(img):
     return center
 
 # execution
-img_path = r"C:\Users\raph-\Desktop\Travail\4A\Majeure Image\Projet Transversal\Program\img\img.png"
+img_path = r"C:\Users\raph-\Desktop\Travail\4A\Majeure Image\Projet Transversal\Program\img\img_test_4.png"
 im = cv2.imread(img_path,0)
 main_detection(im)
 cv2.waitKey(0)
