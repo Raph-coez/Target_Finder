@@ -22,18 +22,30 @@ COUNT = 0
 SEARCHING_TARGET = True
 LUMIERE_TRUE = "L"
 LUMIERE_FALSE = "E"
-DATA = [0,0]
+DATA = [0,0,0,0]
 ANGLE = 278
+ANGLE_VERTICAL = 160
 
 
 # fonctions
 
-def correction_value(x,w):
+def vertical_correction_value(pos,y,h):
+    correction = 0
+    mh = h/2
+    middle_target = y + int(mh)
+    diff =  middle_target - int(pos[1])
+    tolerance = 7
+    if diff > tolerance:
+        correction += 2 
+    if diff < -1*tolerance:
+        correction -= 2
+    return correction
+
+def horizontal_correction_value(x,w):
     correction = 0
     mw = w/2
     middle_target = x+int(mw)
     diff = int(WIDTH_FRAME/2) - middle_target
-    print("YOOOOOOOOOOOOOOOOOOOOOY" + str(diff), int(WIDTH_FRAME/2))
     tolerance = 7
     if diff > tolerance:
         correction += 2
@@ -41,12 +53,26 @@ def correction_value(x,w):
         correction -= 2
     return correction
 
+def correction_verticale(pointeur_pos,y,h):
+    angle = ANGLE_VERTICAL
+    if vertical_correction_value(y,h) != 0:
+        print('Correction verticale necessaire ...')
+        new_angle = angle + vertical_correction_value(pointeur_pos,y,h)
+        print('Nouvel angle vertical : ' + str(new_angle))
+        p = False
+        return new_angle, p
+    else:
+        print('Correction non necessaire ...')
+        print('Arret de la correction')
+        p = True
+        return angle, p
+    
 def correction_horizontale(im,x,w):
 
     angle = ANGLE
-    if correction_value(x,w) != 0:
+    if horizontal_correction_value(x,w) != 0:
         print('Correction necessaire ...')
-        new_angle = angle + correction_value(x,w)
+        new_angle = angle + horizontal_correction_value(x,w)
         print('Nouvel angle : ' + str(new_angle))
         p = False
         return new_angle, p
@@ -90,11 +116,33 @@ def check_detection(detector, gray_img):
 
 def set_data(rect,frame):
     for (fX, fY, fW, fH) in rect:
-        DATA = [fX,fW]
+        DATA = [fX,fW,fY,fH]
         cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH), (0, 0, 255), 2)
         distance = int(13315*exp(-0.986*log(fH)))
         return distance
-    
+
+def vertical_target(pointeur_pos, detect, ser):
+    if (detect):
+        sleep(0.1)
+        im = cv2.imread('..\img\img.png',0)
+        y,h = DATA[2],DATA[3]
+        angle, PROCESSED = correction_verticale(pointeur_pos,y,h)
+        consigne = str(angle) + 'F'
+        ser.write(consigne.encode())
+        if PROCESSED:
+            print('Cible atteinte ***********')
+            print('Arret de la correction')
+            ser.write(LUMIERE_FALSE.encode())
+            sleep(0.5)
+            ser.write(LUMIERE_TRUE.encode())
+            SEARCHING_TARGET = False
+        else:
+            if (angle < 3 or angle > 176):
+                print('Angle maximal atteint')
+            else:
+                ANGLE = angle
+                print('Angle modifé : ' + str(angle))
+            
 def horizontal_target(detected,ser):
     if(detected):
         sleep(0.1)
@@ -104,10 +152,9 @@ def horizontal_target(detected,ser):
         consigne = str(angle) + 'F'
         ser.write(consigne.encode())
         if PROCESSED:
-            print('Cible atteinte')
+            print('Position horizontale atteinte')
             print("Arret de la correction d'angle horizontal")
             ser.write(LUMIERE_TRUE.encode())
-            SEARCHING_TARGET = False
         else:
             if (angle < 183 or angle > 356):
                 print('Angle maximal atteint')
@@ -115,7 +162,7 @@ def horizontal_target(detected,ser):
                 ANGLE = angle
                 print('Angle modifé : ' + str(angle))
 
-def TOR_Pointeur(img):  # a, b, c, d : tolerance en RGBA
+def TOR_Pointeur(img): 
     format = np.shape(img)
     new_img = np.empty(format)
     for i in range(format[0]):
@@ -129,7 +176,6 @@ def TOR_Pointeur(img):  # a, b, c, d : tolerance en RGBA
     new_img = cv2.morphologyEx(new_img,cv2.MORPH_CLOSE,form_2)
     return new_img
 
-# la fonction suivante renvoie true si au moins un pixel blanc (du pointeur) est repéré, false sinon
 def check_if_pixel_blanc(img):
     ret = False
     format = np.shape(img)
@@ -139,7 +185,6 @@ def check_if_pixel_blanc(img):
                 ret = True
     return ret
 
-# la fonction suivante renvoie la position du pixel au centre du pointeur
 def get_pointeur_position(img):
     center = (0,0)
     bords = []
