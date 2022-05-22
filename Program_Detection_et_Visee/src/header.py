@@ -35,6 +35,7 @@ def check_searching_target():
     global SEARCHING_TARGET
     a = SEARCHING_TARGET
     return a
+
 def vertical_correction_value(pos,y,h):
     correction = 0
     mh = h/2
